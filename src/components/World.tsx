@@ -16,7 +16,7 @@ export default function World() {
 
   return (
     <>
-      <div className="w-full h-[calc(95dvh)] overflow-scroll border-2 border-neutral-500 bg-blue-400">
+      <div className="w-full h-[calc(95dvh)] overflow-scroll scrollbar border-2 border-neutral-500 bg-blue-400 p-12">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="2000"
