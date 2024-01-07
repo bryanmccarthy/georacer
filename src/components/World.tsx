@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const countryStyleStates = {
   unselected: "hover:fill-current hover:text-neutral-100 cursor-pointer",
@@ -6,6 +6,7 @@ const countryStyleStates = {
 };
 
 export default function World() {
+  const worldRef = useRef<any>(null);
   // TODO: finish initial state
   const [selected, setSelected] = useState<any>({
     'Angola': false,
@@ -14,10 +15,15 @@ export default function World() {
     'Azerbaijan': false
   });
 
+  useEffect(() => {
+    if (worldRef.current) worldRef.current.scrollIntoView({behavior: 'instant', block: 'center', inline: 'center'});
+  }, [worldRef.current])
+
   return (
     <>
       <div className="w-full h-[calc(95dvh)] overflow-scroll scrollbar border-2 border-neutral-500 bg-blue-400 p-12">
         <svg
+          ref={worldRef}
           xmlns="http://www.w3.org/2000/svg"
           width="2000"
           height="857"
