@@ -11,7 +11,7 @@ type Position = {
 export default function World() {
   const [position, setPosition] = useState<Position>({ coordinates: [0, 0], zoom: 1 });
   const [countries, setCountries] = useState<any>(countriesList);
-  const [currCountry, setCurrCountry] = useState<string>('United States');
+  const [currCountry, setCurrCountry] = useState<string>('');
 
   const handleZoomIn = () => {
     if (position.zoom >= 3) return;
@@ -29,13 +29,17 @@ export default function World() {
 
   const handleGeoClick = (geo: any) => {
     console.log(geo);
-    // if correct, remove from list
+    if (currCountry === geo.properties.name) {
+      console.log('correct: ' + currCountry); // TODO: remove
+      const newCountries = countries.filter((country: string) => country !== currCountry);
+      setCountries(newCountries);
+      setCurrCountry(newCountries[Math.floor(Math.random() * countries.length)])
+    }
   }
 
-  useEffect(() => {
-    // Grab a random country from the list
-    // set the current country to that country
-  }, [countries])
+  const handleStart = () => {
+    setCurrCountry(countries[Math.floor(Math.random() * countries.length)]);
+  }
 
   // TODO: add resize listener to zoom in/out on window resize
   // TODO: set initial zoom based on window size
@@ -43,6 +47,8 @@ export default function World() {
   return (
     <>
       <div className="w-full h-full overflow-hidden">
+        {/* TODO: implement proper game start */}
+        <button className={`absolute top-0 left-0 m-2 p-2 px-4 bg-black text-white rounded-md ${currCountry === '' ? 'visible' : 'invisible'}`} onClick={handleStart}>Start</button>
         <CountryToSelect currCountry={currCountry} />
         <Controls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} />
         <ComposableMap className="w-full h-full bg-blue-500">
