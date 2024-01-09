@@ -1,4 +1,4 @@
-const counties = [
+export const countriesList = [
   "Fiji",
   "Tanzania",
   "W. Sahara",
