@@ -1,7 +1,7 @@
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps'
 import geoJSON from '../geoData/countries.json'
 import { countriesList } from '../geoData/countries.ts'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 type Position = {
   coordinates: [number, number],
@@ -10,7 +10,8 @@ type Position = {
 
 export default function World() {
   const [position, setPosition] = useState<Position>({ coordinates: [0, 0], zoom: 1 });
-  const [countries, setCountries] = useState<any>(countriesList);
+  const [countries, setCountries] = useState<string[]>(countriesList);
+  const [correct, setCorrect] = useState<string[]>([]);
   const [currCountry, setCurrCountry] = useState<string>('');
 
   const handleZoomIn = () => {
@@ -28,12 +29,15 @@ export default function World() {
   }
 
   const handleGeoClick = (geo: any) => {
-    console.log(geo);
     if (currCountry === geo.properties.name) {
-      console.log('correct: ' + currCountry); // TODO: remove
+      setCorrect([...correct, currCountry]);
+      console.log('correct guess: ' + currCountry); // TODO: remove
       const newCountries = countries.filter((country: string) => country !== currCountry);
       setCountries(newCountries);
-      setCurrCountry(newCountries[Math.floor(Math.random() * countries.length)])
+      setCurrCountry(newCountries[Math.floor(Math.random() * countries.length)]);
+      console.log('correct list: ', correct);
+    } else {
+      console.log('wrong: ', geo.properties.name);
     }
   }
 
@@ -56,7 +60,7 @@ export default function World() {
             <Geographies geography={geoJSON}>
               {({ geographies }) =>
                 geographies.map((geo) => (
-                  <Geography className="outline-none fill-current text-neutral-500 stroke-black cursor-pointer hover:text-neutral-600" key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
+                  <Geography className={`outline-none fill-current ${correct.includes(geo.properties.name) ? 'text-green-600 stroke-neutral-800' : 'text-neutral-500 stroke-neutral-800 cursor-pointer hover:text-neutral-600'}`} key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
                 ))
               }
             </Geographies>
