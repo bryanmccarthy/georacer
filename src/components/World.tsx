@@ -1,5 +1,5 @@
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps'
-import geoJSON from '../geo/countries.json'
+import geoJSON from '../geoData/countries.json'
 import { useState } from 'react'
 
 type Position = {
@@ -12,12 +12,12 @@ export default function World() {
 
   const handleZoomIn = () => {
     if (position.zoom >= 4) return;
-    setPosition(pos => ({ ...pos, zoom: pos.zoom * 2 }));
+    setPosition(pos => ({ ...pos, zoom: pos.zoom + 1 }));
   }
 
   const handleZoomOut = () => {
     if (position.zoom <= 1) return;
-    setPosition(pos => ({ ...pos, zoom: pos.zoom / 2 }));
+    setPosition(pos => ({ ...pos, zoom: pos.zoom - 1 }));
   }
 
   const handleMoveEnd = (position: any) => {
@@ -30,7 +30,7 @@ export default function World() {
 
   return (
     <>
-      <div className="w-full h-full overflow-scroll">
+      <div className="h-full overflow-scroll">
         <Controls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} />
         <ComposableMap className="bg-blue-500">
           <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd}>
