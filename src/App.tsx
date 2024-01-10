@@ -14,7 +14,7 @@ function App() {
           <Menu setGameState={setGameState} />
         }
         { gameState === 'countryGuesser' &&
-          <CountryGuesser />
+          <CountryGuesser setGameState={setGameState} />
         }
       </div>
     </>

@@ -9,13 +9,15 @@ type Position = {
   zoom: number
 }
 
-export default function CountryGuesser() {
+export default function CountryGuesser({ setGameState }: { setGameState: (state: string) => void}) {
   const windowDimensions = useWindowDimensions();
   let zoom = windowDimensions.width < 400 ? 3 : windowDimensions.width < 700 ? 2 : windowDimensions.width < 1000 ? 1.5 : 1;
   const [position, setPosition] = useState<Position>({ coordinates: [0, 0], zoom: zoom });
   const [countries, setCountries] = useState<string[]>(countriesList);
   const [correct, setCorrect] = useState<string[]>([]);
   const [currCountry, setCurrCountry] = useState<string>('');
+  const [gameActive, setGameActive] = useState(false);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const handleZoomIn = () => {
     if (position.zoom >= 4) return;
@@ -45,7 +47,23 @@ export default function CountryGuesser() {
   }
 
   const handleStart = () => {
+    setGameActive(true);
     setCurrCountry(countries[Math.floor(Math.random() * countries.length)]);
+  }
+
+  const handleShowSettings = () => {
+    setShowSettings(!showSettings);
+  }
+
+  const handleRestartClick = () => {
+    setCountries(countriesList);
+    setCurrCountry(countriesList[Math.floor(Math.random() * countriesList.length)]);
+    setCorrect([]);
+    setShowSettings(false);
+  }
+
+  const handleMenuClick = () => {
+    setGameState('menu');
   }
 
   // TODO: add resize listener to zoom in/out on window resize
@@ -54,32 +72,52 @@ export default function CountryGuesser() {
   return (
     <>
       <div className="w-full h-full overflow-hidden">
-        {/* TODO: implement proper game start */}
-        <button className={`absolute top-0 left-0 m-2 p-2 px-4 bg-black text-white rounded-md ${currCountry === '' ? 'visible' : 'invisible'}`} onClick={handleStart}>Start</button>
-        <CountryToSelect currCountry={currCountry} />
-        <Controls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} />
-        <ComposableMap className="w-full h-full bg-blue-500">
-          <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd}>
-            <Geographies geography={geoJSON}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography className={`outline-none fill-current ${correct.includes(geo.properties.name) ? 'text-green-600 stroke-neutral-800' : 'text-neutral-500 stroke-neutral-800 cursor-pointer hover:text-neutral-600'}`} key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
-                ))
-              }
-            </Geographies>
-          </ZoomableGroup>
-        </ComposableMap>
+        { gameActive ?
+          <div className="relative w-full h-full overflow-hidden">
+          <CountryToSelect currCountry={currCountry} />
+          <Controls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleShowSettings={handleShowSettings} />
+          <ComposableMap className="w-full h-full bg-blue-500">
+            <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd}>
+              <Geographies geography={geoJSON}>
+                {({ geographies }) =>
+                  geographies.map((geo) => (
+                    <Geography className={`outline-none fill-current ${correct.includes(geo.properties.name) ? 'text-green-600 stroke-neutral-800' : 'text-neutral-500 stroke-neutral-800 cursor-pointer hover:text-neutral-600'}`} key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
+                  ))
+                }
+              </Geographies>
+            </ZoomableGroup>
+          </ComposableMap>
+          { showSettings &&
+            <div className="absolute flex flex-col right-2 top-14 w-36 h-36 bg-white border-black rounded overflow-hidden shadow-lg">
+              <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
+              <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none py-2 px-4" onClick={handleMenuClick}>menu</button>
+            </div>
+          }
+          </div>
+        :
+          <div className="w-full h-full flex items-center justify-center bg-orange-300">
+            <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none shadow-lg py-2 px-4 rounded-sm" onClick={handleStart}>start</button>
+          </div>
+        }
+        
       </div>
     </>
   )
 }
 
-function Controls({ handleZoomIn, handleZoomOut }: { handleZoomIn: () => void, handleZoomOut: () => void }) {
+type ControlsPropsTypes = {
+  handleZoomIn: () => void;
+  handleZoomOut: () => void;
+  handleShowSettings: () => void;
+}
+
+function Controls({ handleZoomIn, handleZoomOut, handleShowSettings }: ControlsPropsTypes) {
   return (
     <>
       <div className="absolute right-0 flex gap-2 p-2">
         <button className="px-4 py-2 bg-black text-white rounded-md" onClick={handleZoomIn}>+</button>
         <button className="px-4 py-2 bg-black text-white rounded-md" onClick={handleZoomOut}>-</button>
+        <button className="px-4 py-2 bg-black text-white rounded-md" onClick={handleShowSettings}>=</button>
       </div>
     </>
   )
