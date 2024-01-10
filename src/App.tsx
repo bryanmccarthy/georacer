@@ -1,4 +1,4 @@
-import World from './components/World';
+import CountryGuesser from './components/CountryGuesser';
 import Menu from './components/Menu';
 import { useState } from 'react';
 
@@ -14,7 +14,7 @@ function App() {
           <Menu setGameState={setGameState} />
         }
         { gameState === 'countryGuesser' &&
-          <World />
+          <CountryGuesser />
         }
       </div>
     </>

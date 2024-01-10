@@ -9,7 +9,7 @@ type Position = {
   zoom: number
 }
 
-export default function World() {
+export default function CountryGuesser() {
   const windowDimensions = useWindowDimensions();
   let zoom = windowDimensions.width < 400 ? 3 : windowDimensions.width < 700 ? 2 : windowDimensions.width < 1000 ? 1.5 : 1;
   const [position, setPosition] = useState<Position>({ coordinates: [0, 0], zoom: zoom });
