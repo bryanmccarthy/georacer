@@ -2,6 +2,7 @@ import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simp
 import geoJSON from '../geoData/countries.json'
 import { countriesList } from '../geoData/countries.ts'
 import { useState } from 'react'
+import useWindowDimensions from '../hooks/useWindowDimensions.tsx'
 
 type Position = {
   coordinates: [number, number],
@@ -9,13 +10,15 @@ type Position = {
 }
 
 export default function World() {
-  const [position, setPosition] = useState<Position>({ coordinates: [0, 0], zoom: 1 });
+  const windowDimensions = useWindowDimensions();
+  let zoom = windowDimensions.width < 400 ? 3 : windowDimensions.width < 700 ? 2 : windowDimensions.width < 1000 ? 1.5 : 1;
+  const [position, setPosition] = useState<Position>({ coordinates: [0, 0], zoom: zoom });
   const [countries, setCountries] = useState<string[]>(countriesList);
   const [correct, setCorrect] = useState<string[]>([]);
   const [currCountry, setCurrCountry] = useState<string>('');
 
   const handleZoomIn = () => {
-    if (position.zoom >= 3) return;
+    if (position.zoom >= 4) return;
     setPosition(pos => ({ ...pos, zoom: pos.zoom + 0.5 }));
   }
 
@@ -71,12 +74,7 @@ export default function World() {
   )
 }
 
-type ControlsProps = {
-  handleZoomIn: () => void,
-  handleZoomOut: () => void
-}
-
-function Controls({ handleZoomIn, handleZoomOut }: ControlsProps) {
+function Controls({ handleZoomIn, handleZoomOut }: { handleZoomIn: () => void, handleZoomOut: () => void }) {
   return (
     <>
       <div className="absolute right-0 flex gap-2 p-2">
