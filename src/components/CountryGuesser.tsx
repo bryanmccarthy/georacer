@@ -1,7 +1,7 @@
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps'
 import geoJSON from '../geoData/countries.json'
 import { countriesList } from '../geoData/countries.ts'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useWindowDimensions from '../hooks/useWindowDimensions.tsx'
 
 type Position = {
@@ -20,6 +20,9 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<string>('3');
   const [inGameCountdown, setInGameCountdown] = useState<boolean>(false);
+  const [timerRunning, setTimerRunning] = useState<boolean>(false);
+  const [time, setTime] = useState<number>(0);
+  const [showTimer, setShowTimer] = useState<boolean>(true);
 
   const handleZoomIn = () => {
     if (position.zoom >= 4) return;
@@ -87,10 +90,17 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
     })
     await timeout(600).then(() => {
       initialGameState();
+      setTimerRunning(true);
       setInGameCountdown(false);
       setCountdown('3');
     })
   }
+
+  useEffect(() => {
+    let intervalId: any;
+    if (timerRunning) intervalId = setInterval(() => { setTime(time + 1) }, 10);
+    return () => clearInterval(intervalId);
+  }, [timerRunning, time])
   
   // TODO: add resize listener to zoom in/out on window resize
   // TODO: set initial zoom based on window size
@@ -101,6 +111,9 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
         { gameActive ?
           <div className="relative w-full h-full overflow-hidden">
             <CountryToSelect currCountry={currCountry} />
+            { showTimer &&
+              <Timer time={time} />
+            }
             <Controls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} showSettings={showSettings} handleShowSettings={handleShowSettings} />
             <ComposableMap className="w-full h-full bg-blue-500">
               <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd}>
@@ -115,8 +128,9 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
             </ComposableMap>
             { showSettings &&
               <div className="absolute flex flex-col right-2 top-14 w-36 bg-white border-black rounded overflow-hidden shadow-lg">
+                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={() => setShowTimer(!showTimer)}>{ showTimer ? <p>hide time</p> : <p>show time</p>}</button>
                 <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
-                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleMenuClick}>home</button>
+                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleMenuClick}>quit</button>
               </div>
             }
             { inGameCountdown &&
@@ -179,6 +193,25 @@ function CountryToSelect({ currCountry }: { currCountry: string }) {
     <>
       <div className="absolute left-0 top-0 p-2">
         <p className="text-3xl tracking-wider text-white font-semibold drop-shadow">{currCountry}</p>
+      </div>
+    </>
+  )
+}
+
+function Timer({ time }: { time: number }) {
+
+  const formatTime = (time: number): string => {
+    const hours = Math.floor(time / 360000);
+    const minutes = Math.floor((time % 360000) / 6000);
+    const seconds = Math.floor((time % 6000) / 100);
+    const milliseconds = time % 100;
+    return `${hours}:${minutes}:${seconds}:${milliseconds}`;
+  }
+
+  return (
+    <>
+      <div className="absolute left-0 top-8 text-neutral-200 p-2 text-3xl">
+        {formatTime(time)}
       </div>
     </>
   )
