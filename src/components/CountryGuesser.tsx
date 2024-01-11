@@ -107,7 +107,7 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
                 <Geographies geography={geoJSON}>
                   {({ geographies }) =>
                     geographies.map((geo) => (
-                      <Geography className={`outline-none fill-current ${correct.includes(geo.properties.name) ? 'text-green-600 stroke-neutral-800' : 'text-neutral-500 stroke-neutral-800 cursor-pointer hover:text-neutral-600'}`} key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
+                      <Geography className={`outline-none fill-current stroke-neutral-100 stroke-[0.1px] ${correct.includes(geo.properties.name) ? 'text-green-600' : 'text-neutral-800 cursor-pointer hover:text-neutral-100'}`} key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
                     ))
                   }
                 </Geographies>
@@ -115,8 +115,8 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
             </ComposableMap>
             { showSettings &&
               <div className="absolute flex flex-col right-2 top-14 w-36 bg-white border-black rounded overflow-hidden shadow-lg">
-                <button className="bg-black hover:bg-neutral-800 text-orange-300 font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
-                <button className="bg-black hover:bg-neutral-800 text-orange-300 font-bold border-none py-2 px-4" onClick={handleMenuClick}>home</button>
+                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
+                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleMenuClick}>home</button>
               </div>
             }
             { inGameCountdown &&
@@ -177,8 +177,8 @@ function Controls({ handleZoomIn, handleZoomOut, showSettings, handleShowSetting
 function CountryToSelect({ currCountry }: { currCountry: string }) {
   return (
     <>
-      <div className="absolute left-0 flex gap-2 p-2">
-        <p className="p-2 text-2xl tracking-wider text-white font-bold">{currCountry}</p>
+      <div className="absolute left-0 top-0 p-2">
+        <p className="text-3xl tracking-wider text-white font-semibold drop-shadow">{currCountry}</p>
       </div>
     </>
   )
