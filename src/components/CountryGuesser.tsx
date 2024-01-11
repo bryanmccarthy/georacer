@@ -18,6 +18,8 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
   const [currCountry, setCurrCountry] = useState<string>('');
   const [gameActive, setGameActive] = useState(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<string>('3');
+  const [inGameCountdown, setInGameCountdown] = useState<boolean>(false);
 
   const handleZoomIn = () => {
     if (position.zoom >= 4) return;
@@ -46,8 +48,7 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
     }
   }
 
-  const handleStart = () => {
-    setGameActive(true);
+  const initialGameState = () => {
     setCurrCountry(countries[Math.floor(Math.random() * countries.length)]);
   }
 
@@ -57,15 +58,40 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
 
   const handleRestartClick = () => {
     setCountries(countriesList);
-    setCurrCountry(countriesList[Math.floor(Math.random() * countriesList.length)]);
+    setCurrCountry('');
     setCorrect([]);
     setShowSettings(false);
+    handleGameCountdown();
   }
 
   const handleMenuClick = () => {
     setGameState('menu');
   }
 
+  const timeout = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  // TODO: refactor this
+  const handleGameCountdown = async () => {
+    setGameActive(true);
+    setInGameCountdown(true);
+    await timeout(1000).then(() => {
+      setCountdown('2');
+    })
+    await timeout(1000).then(() => {
+      setCountdown('1');
+    })
+    await timeout(1000).then(() => {
+      setCountdown('GO!');
+    })
+    await timeout(600).then(() => {
+      initialGameState();
+      setInGameCountdown(false);
+      setCountdown('3');
+    })
+  }
+  
   // TODO: add resize listener to zoom in/out on window resize
   // TODO: set initial zoom based on window size
 
@@ -74,29 +100,34 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
       <div className="w-full h-full overflow-hidden">
         { gameActive ?
           <div className="relative w-full h-full overflow-hidden">
-          <CountryToSelect currCountry={currCountry} />
-          <Controls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleShowSettings={handleShowSettings} />
-          <ComposableMap className="w-full h-full bg-blue-500">
-            <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd}>
-              <Geographies geography={geoJSON}>
-                {({ geographies }) =>
-                  geographies.map((geo) => (
-                    <Geography className={`outline-none fill-current ${correct.includes(geo.properties.name) ? 'text-green-600 stroke-neutral-800' : 'text-neutral-500 stroke-neutral-800 cursor-pointer hover:text-neutral-600'}`} key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
-                  ))
-                }
-              </Geographies>
-            </ZoomableGroup>
-          </ComposableMap>
-          { showSettings &&
-            <div className="absolute flex flex-col right-2 top-14 w-36 h-36 bg-white border-black rounded overflow-hidden shadow-lg">
-              <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
-              <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none py-2 px-4" onClick={handleMenuClick}>menu</button>
-            </div>
-          }
+            <CountryToSelect currCountry={currCountry} />
+            <Controls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleShowSettings={handleShowSettings} />
+            <ComposableMap className="w-full h-full bg-blue-500">
+              <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd}>
+                <Geographies geography={geoJSON}>
+                  {({ geographies }) =>
+                    geographies.map((geo) => (
+                      <Geography className={`outline-none fill-current ${correct.includes(geo.properties.name) ? 'text-green-600 stroke-neutral-800' : 'text-neutral-500 stroke-neutral-800 cursor-pointer hover:text-neutral-600'}`} key={geo.rsmKey} geography={geo} onClick={() => handleGeoClick(geo)} />
+                    ))
+                  }
+                </Geographies>
+              </ZoomableGroup>
+            </ComposableMap>
+            { showSettings &&
+              <div className="absolute flex flex-col right-2 top-14 w-36 h-36 bg-white border-black rounded overflow-hidden shadow-lg">
+                <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
+                <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none py-2 px-4" onClick={handleMenuClick}>menu</button>
+              </div>
+            }
+            { inGameCountdown &&
+              <div className="absolute flex items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-neutral-500 bg-opacity-50">
+                <p className="text-8xl text-white text-bold">{countdown}</p>
+              </div>
+            }
           </div>
         :
           <div className="w-full h-full flex items-center justify-center bg-orange-300">
-            <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none shadow-lg py-2 px-4 rounded-sm" onClick={handleStart}>start</button>
+            <button className="bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none shadow-lg py-2 px-4 rounded-sm" onClick={handleGameCountdown}>start</button>
           </div>
         }
         
