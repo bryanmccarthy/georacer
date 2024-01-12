@@ -127,11 +127,7 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
               </ZoomableGroup>
             </ComposableMap>
             { showSettings &&
-              <div className="absolute flex flex-col right-2 top-14 w-36 bg-white border-black rounded overflow-hidden shadow-lg">
-                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={() => setShowTimer(!showTimer)}>{ showTimer ? <p>hide time</p> : <p>show time</p>}</button>
-                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
-                <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleMenuClick}>quit</button>
-              </div>
+              <Settings showTimer={showTimer} setShowTimer={setShowTimer} handleRestartClick={handleRestartClick} handleMenuClick={handleMenuClick} />
             }
             { inGameCountdown &&
               <div className="absolute flex items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-neutral-500 bg-opacity-50">
@@ -140,21 +136,48 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
             }
           </div>
         :
-          <div className="relative w-full h-full flex items-center justify-center bg-orange-300">
-            <div className="absolute top-2 left-2">
-              <button className="text-white drop-shadow text-lg font-semibold hover:pl-1" onClick={handleMenuClick}>back</button>
-            </div>
-            <div className="flex flex-col w-10/12 max-w-80 h-64">
-              <p className="text-white text-3xl font-bold drop-shadow text-center p-2">Country Guesser</p>
-              <p className="text-white text-lg drop-shadow p-2 text-center">Find every country as fast as possible. The current country will be displayed in the top left.</p>
-              <button className="mt-auto m-4 bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none shadow-lg py-2 px-4 rounded-sm" onClick={handleGameCountdown}>start</button>
-            </div>
-          </div>
+          <ModeSelect handleMenuClick={handleMenuClick} handleGameCountdown={handleGameCountdown} />
         }
         
       </div>
     </>
   )
+}
+
+type SettingsPropsTypes = {
+  showTimer: boolean;
+  setShowTimer: (showTimer: boolean) => void;
+  handleRestartClick: () => void;
+  handleMenuClick: () => void;
+}
+
+function Settings({ showTimer, setShowTimer, handleRestartClick, handleMenuClick }: SettingsPropsTypes) {
+  return (
+    <>
+      <div className="absolute flex flex-col right-2 top-14 w-36 bg-white border-black rounded overflow-hidden shadow-lg">
+        <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={() => setShowTimer(!showTimer)}>{ showTimer ? <p>hide time</p> : <p>show time</p>}</button>
+        <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleRestartClick}>restart</button>
+        <button className="bg-black hover:bg-neutral-800 text-white font-bold border-none py-2 px-4" onClick={handleMenuClick}>quit</button>
+      </div> 
+    </>
+  )
+}
+
+function ModeSelect({ handleMenuClick, handleGameCountdown }: { handleMenuClick: () => void, handleGameCountdown: () => void}) {
+ return (
+  <>
+    <div className="relative w-full h-full flex items-center justify-center bg-orange-300">
+      <div className="absolute top-2 left-2">
+        <button className="text-white drop-shadow text-lg font-semibold hover:pl-1" onClick={handleMenuClick}>back</button>
+      </div>
+      <div className="flex flex-col w-10/12 max-w-80 h-64">
+        <p className="text-white text-3xl font-bold drop-shadow text-center p-2">Country Guesser</p>
+        <p className="text-white text-lg drop-shadow p-2 text-center">Find every country as fast as possible. The current country will be displayed in the top left.</p>
+        <button className="mt-auto m-4 bg-white hover:bg-neutral-100 text-orange-300 font-bold border-none shadow-lg py-2 px-4 rounded-sm" onClick={handleGameCountdown}>start</button>
+      </div>
+    </div>
+  </>
+ ) 
 }
 
 type ControlsPropsTypes = {
