@@ -53,6 +53,7 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
 
   const initialGameState = () => {
     setCurrCountry(countries[Math.floor(Math.random() * countries.length)]);
+    setTimerRunning(true);
   }
 
   const handleShowSettings = () => {
@@ -65,6 +66,8 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
     setCorrect([]);
     setShowSettings(false);
     handleGameCountdown();
+    setTimerRunning(false);
+    setTime(0);
   }
 
   const handleMenuClick = () => {
@@ -90,7 +93,6 @@ export default function CountryGuesser({ setGameState }: { setGameState: (state:
     })
     await timeout(600).then(() => {
       initialGameState();
-      setTimerRunning(true);
       setInGameCountdown(false);
       setCountdown('3');
     })
